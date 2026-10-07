@@ -300,6 +300,8 @@
       const todo = todos.find(t => t.id === li.dataset.id);
       if (!todo) return;
 
+      const index = todos.indexOf(todo);
+      let focusIndex = index;
       if (e.target.tagName === 'BUTTON') {
         todos = todos.filter(t => t !== todo);
       } else if (e.target.tagName === 'INPUT' || e.target.tagName === 'SPAN') {
@@ -310,6 +312,11 @@
       }
       save();
       render();
+
+      // 다시 그린 뒤에도 키보드 포커스가 유지되도록 같은 위치의 체크박스로 복원
+      const target = list.children[Math.min(focusIndex, todos.length - 1)];
+      if (target) target.querySelector('input').focus();
+      else input.focus();
     });
 
     render();
