@@ -5,7 +5,173 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>할 일</title>
   <style>
-    /* 3단계에서 작성 */
+    :root {
+      --bg: #f6f7f9;
+      --card: #ffffff;
+      --text: #1f2430;
+      --muted: #9aa1ad;
+      --line: #e6e8ec;
+      --accent: #3b6cf6;
+      --accent-dark: #2f58d0;
+      --danger: #e5484d;
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo",
+                   "Malgun Gothic", "Noto Sans KR", sans-serif;
+      line-height: 1.5;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    main {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 40px 16px 48px;
+    }
+
+    h1 {
+      margin: 0 0 4px;
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    #remaining {
+      margin: 0 0 24px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    #remaining-count {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    #todo-form {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    #todo-form label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    #todo-input {
+      flex: 1;
+      min-width: 0;
+      height: 48px;
+      padding: 0 14px;
+      font: inherit;
+      font-size: 16px;
+      color: var(--text);
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+
+    #todo-input::placeholder { color: var(--muted); }
+
+    #todo-form button {
+      height: 48px;
+      padding: 0 20px;
+      font: inherit;
+      font-weight: 600;
+      color: #fff;
+      background: var(--accent);
+      border: 0;
+      border-radius: var(--radius);
+      cursor: pointer;
+    }
+
+    #todo-form button:hover { background: var(--accent-dark); }
+    #todo-form button:active { transform: scale(0.97); }
+
+    #todo-input:focus-visible,
+    #todo-form button:focus-visible,
+    #todo-list button:focus-visible,
+    #todo-list input[type="checkbox"]:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    #todo-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    #todo-list:empty { display: none; }
+
+    #todo-list li {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      min-height: 56px;
+      padding: 0 4px 0 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    #todo-list li:last-child { border-bottom: 0; }
+
+    #todo-list input[type="checkbox"] {
+      flex: none;
+      width: 20px;
+      height: 20px;
+      margin: 0 12px 0 16px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    #todo-list span {
+      flex: 1;
+      min-width: 0;
+      padding: 12px 0;
+      overflow-wrap: anywhere;
+      cursor: pointer;
+    }
+
+    #todo-list li.done span {
+      color: var(--muted);
+      text-decoration: line-through;
+    }
+
+    #todo-list button {
+      flex: none;
+      width: 44px;
+      height: 44px;
+      font-size: 1.4rem;
+      line-height: 1;
+      color: var(--muted);
+      background: none;
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    #todo-list button:hover { color: var(--danger); background: #fdeced; }
+
+    #empty-message {
+      margin: 32px 0 0;
+      text-align: center;
+      color: var(--muted);
+    }
   </style>
 </head>
 <body>
