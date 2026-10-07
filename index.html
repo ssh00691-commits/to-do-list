@@ -4,16 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>할 일</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Jua&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f6f7f9;
-      --card: #ffffff;
-      --text: #1f2430;
-      --muted: #9aa1ad;
-      --line: #e6e8ec;
-      --accent: #3b6cf6;
-      --accent-dark: #2f58d0;
-      --danger: #e5484d;
+      --bg: #ffb877;
+      --card: rgba(255, 252, 247, 0.92);
+      --text: #3d2314;
+      --muted: #a48467;
+      --line: #f0dcc6;
+      --accent: #e8590c;
+      --accent-dark: #c2410c;
+      --danger: #d6336c;
       --radius: 12px;
     }
 
@@ -21,10 +24,13 @@
 
     body {
       margin: 0;
-      background: var(--bg);
+      min-height: 100vh;
       color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo",
-                   "Malgun Gothic", "Noto Sans KR", sans-serif;
+      /* 따뜻한 노을 배경: 해, 언덕 실루엣을 SVG로 직접 그림 (외부 이미지 없음) */
+      background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 600' preserveAspectRatio='xMidYMax slice'%3E%3Ccircle cx='400' cy='430' r='150' fill='%23fff3c4' opacity='.85'/%3E%3Ccircle cx='400' cy='430' r='230' fill='%23fff3c4' opacity='.25'/%3E%3Cpath d='M0 520 Q200 440 400 500 T800 480 V600 H0Z' fill='%23e8743b' opacity='.75'/%3E%3Cpath d='M0 560 Q250 500 480 550 T800 540 V600 H0Z' fill='%23c2410c' opacity='.8'/%3E%3C/svg%3E") center bottom / cover no-repeat fixed,
+        linear-gradient(180deg, #ffd9a0 0%, #ffb877 45%, #ff9a6c 100%) fixed;
+      font-family: "Jua", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
       line-height: 1.5;
       -webkit-text-size-adjust: 100%;
     }
@@ -37,21 +43,32 @@
 
     h1 {
       margin: 0 0 4px;
-      font-size: 1.75rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
+      font-family: "Black Han Sans", "Jua", sans-serif;
+      font-size: 2.4rem;
+      font-weight: 400;
+      line-height: 1.2;
+      color: #fff;
+      text-shadow: 2px 3px 0 rgba(194, 65, 12, 0.55);
+      transform: rotate(-2deg);
+      transform-origin: left center;
     }
 
     #remaining {
       margin: 0 0 24px;
-      color: var(--muted);
-      font-size: 0.95rem;
+      color: #7a2e0a;
+      font-size: 1.05rem;
     }
 
     #remaining-count {
       color: var(--accent);
-      font-weight: 700;
-      font-size: 1.1rem;
+      font-family: "Black Han Sans", "Jua", sans-serif;
+      font-weight: 400;
+      font-size: 1.5rem;
+      color: #fff;
+      background: var(--accent);
+      padding: 0 10px;
+      border-radius: 999px;
+      margin: 0 2px;
     }
 
     #todo-form {
@@ -88,7 +105,8 @@
       height: 48px;
       padding: 0 20px;
       font: inherit;
-      font-weight: 600;
+      font-weight: 400;
+      font-size: 1.1rem;
       color: #fff;
       background: var(--accent);
       border: 0;
@@ -165,12 +183,12 @@
       cursor: pointer;
     }
 
-    #todo-list button:hover { color: var(--danger); background: #fdeced; }
+    #todo-list button:hover { color: var(--danger); background: #fde8ef; }
 
     #empty-message {
       margin: 32px 0 0;
       text-align: center;
-      color: var(--muted);
+      color: #7a2e0a;
     }
   </style>
 </head>
