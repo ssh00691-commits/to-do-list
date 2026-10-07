@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>할 일</title>
+  <style>
+    /* 3단계에서 작성 */
+  </style>
+</head>
+<body>
+  <main>
+    <h1>오늘 할 일</h1>
+
+    <p id="remaining">남은 할 일 <span id="remaining-count">0</span>개</p>
+
+    <form id="todo-form">
+      <label for="todo-input">할 일 입력</label>
+      <input id="todo-input" type="text" maxlength="100" placeholder="할 일을 입력하세요" autocomplete="off">
+      <button type="submit">추가</button>
+    </form>
+
+    <ul id="todo-list">
+      <!-- 임시 샘플: 2단계에서 제거 -->
+      <li>
+        <input type="checkbox" aria-label="완료">
+        <span>샘플 할 일 1</span>
+        <button type="button" aria-label="삭제">×</button>
+      </li>
+      <li>
+        <input type="checkbox" aria-label="완료" checked>
+        <span>샘플 할 일 2 (완료)</span>
+        <button type="button" aria-label="삭제">×</button>
+      </li>
+    </ul>
+
+    <p id="empty-message" hidden>할 일이 없어요. 하나 추가해 보세요.</p>
+  </main>
+
+  <script>
+    // 2단계에서 작성
+  </script>
+</body>
+</html>
