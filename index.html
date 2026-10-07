@@ -185,12 +185,22 @@
 
     #todo-list button:hover { color: var(--danger); background: #fde8ef; }
 
+    #status {
+      margin: 0 0 12px;
+      padding: 8px 12px;
+      font-size: 0.95rem;
+      color: #7a2e0a;
+      background: rgba(255, 252, 247, 0.7);
+      border-radius: var(--radius);
+    }
+
     #empty-message {
       margin: 32px 0 0;
       text-align: center;
       color: #7a2e0a;
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
   <main>
@@ -204,39 +214,81 @@
       <button type="submit">추가</button>
     </form>
 
+    <p id="status" role="status" hidden></p>
+
     <ul id="todo-list"></ul>
 
     <p id="empty-message" hidden>할 일이 없어요. 하나 추가해 보세요.</p>
   </main>
 
   <script>
-    const STORAGE_KEY = 'todo-app-items';
+    const SUPABASE_URL = 'https://thkjhebfrnyexheqrdtq.supabase.co';
+    // publishable 키는 브라우저에 공개되도록 만들어진 키. 접근 제어는 DB의 RLS 정책이 담당한다.
+    const SUPABASE_KEY = 'sb_publishable_sJoOWI-QBQCLBPB6hpkqVA_N4x2C3c-';
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const form = document.getElementById('todo-form');
     const input = document.getElementById('todo-input');
+    const addButton = form.querySelector('button');
     const list = document.getElementById('todo-list');
     const countEl = document.getElementById('remaining-count');
     const emptyMessage = document.getElementById('empty-message');
+    const statusEl = document.getElementById('status');
 
-    let todos = load();
+    let todos = [];
+    let loaded = false;
     let composing = false;
 
-    function load() {
+    function showStatus(message) {
+      statusEl.textContent = message || '';
+      statusEl.hidden = !message;
+    }
+
+    function setEnabled(enabled) {
+      input.disabled = !enabled;
+      addButton.disabled = !enabled;
+    }
+
+    async function fetchTodos() {
+      const { data, error } = await db.from('todos').select('id, text, done').order('created_at');
+      if (error) throw error;
+      todos = data;
+    }
+
+    async function init() {
+      setEnabled(false);
+      showStatus('불러오는 중…');
       try {
-        const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
-        if (!Array.isArray(data)) return [];
-        return data.filter(t => t && typeof t.id === 'string' && typeof t.text === 'string')
-                   .map(t => ({ id: t.id, text: t.text, done: t.done === true }));
+        const { data: { session } } = await db.auth.getSession();
+        if (!session) {
+          const { error } = await db.auth.signInAnonymously();
+          if (error) throw error;
+        }
+        await fetchTodos();
+        loaded = true;
+        showStatus('');
+        setEnabled(true);
       } catch (e) {
-        return [];
+        showStatus('서버에 연결하지 못했어요. 새로고침해 주세요.');
+      }
+      render();
+    }
+
+    async function reload() {
+      try {
+        await fetchTodos();
+        render();
+      } catch (e) {
+        showStatus('서버에 연결하지 못했어요. 새로고침해 주세요.');
       }
     }
 
-    function save() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
-      } catch (e) {
-        // 저장 실패해도 앱은 계속 동작
+    // 체크/삭제는 화면을 먼저 바꾸고 서버에 반영한다. 실패하면 서버 상태로 되돌린다.
+    async function sync(request) {
+      const { error } = await request;
+      if (error) {
+        showStatus('저장하지 못했어요. 목록을 다시 불러옵니다.');
+        await reload();
       }
     }
 
@@ -264,20 +316,26 @@
         list.append(li);
       }
       countEl.textContent = todos.filter(t => !t.done).length;
-      emptyMessage.hidden = todos.length > 0;
+      emptyMessage.hidden = !loaded || todos.length > 0;
     }
 
-    function addTodo() {
+    async function addTodo() {
       const text = input.value.trim();
       if (!text) {
         input.focus();
         return;
       }
-      todos.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), text, done: false });
       input.value = '';
-      save();
-      render();
       input.focus();
+      const { data, error } = await db.from('todos').insert({ text }).select('id, text, done').single();
+      if (error) {
+        showStatus('추가하지 못했어요. 다시 시도해 주세요.');
+        if (!input.value) input.value = text;
+        return;
+      }
+      showStatus('');
+      todos.push(data);
+      render();
     }
 
     input.addEventListener('compositionstart', () => { composing = true; });
@@ -300,26 +358,30 @@
       const todo = todos.find(t => t.id === li.dataset.id);
       if (!todo) return;
 
-      const index = todos.indexOf(todo);
-      let focusIndex = index;
+      const focusIndex = todos.indexOf(todo);
+      let request;
       if (e.target.tagName === 'BUTTON') {
         todos = todos.filter(t => t !== todo);
+        request = db.from('todos').delete().eq('id', todo.id);
       } else if (e.target.tagName === 'INPUT' || e.target.tagName === 'SPAN') {
         // 체크박스 클릭은 이미 checked가 바뀐 상태, 텍스트 클릭은 직접 반전
         todo.done = e.target.tagName === 'INPUT' ? e.target.checked : !todo.done;
+        request = db.from('todos').update({ done: todo.done }).eq('id', todo.id);
       } else {
         return;
       }
-      save();
       render();
 
       // 다시 그린 뒤에도 키보드 포커스가 유지되도록 같은 위치의 체크박스로 복원
       const target = list.children[Math.min(focusIndex, todos.length - 1)];
       if (target) target.querySelector('input').focus();
       else input.focus();
+
+      sync(request);
     });
 
     render();
+    init();
   </script>
 </body>
 </html>
